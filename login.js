@@ -1,4 +1,5 @@
 chrome.storage.local.get(['j_username', 'j_password'], function(items) {
+  
   if (items.j_username && items.j_password) {
     $('#q_shib_login')[0].j_username.value = items.j_username;
     $('#q_shib_login')[0].j_password.value = items.j_password;

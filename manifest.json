@@ -17,6 +17,16 @@
         "login.js"
       ],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://moodle.queensu.ca/2013-14/dashboard.php"
+      ],
+      "js": [
+        "jquery-2.0.3.js",
+        "redirect.js"
+      ],
+      "run_at": "document_end"
     }
   ],
   "permissions": [
