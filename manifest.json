@@ -1,0 +1,25 @@
+{
+  "name": "SOLUS Convenience",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Improvements to SOLUS",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "homepage_url": "https://github.com/Queens-Hacks",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://login.queensu.ca/idp/Authn/UserPassword"
+      ],
+      "js": [
+        "jquery-2.0.3.js",
+        "login.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
+}
