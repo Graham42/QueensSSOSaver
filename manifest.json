@@ -14,13 +14,14 @@
       ],
       "js": [
         "jquery-2.0.3.js",
+        "JQueryRC4.js",
         "login.js"
       ],
       "run_at": "document_end"
     },
     {
       "matches": [
-        "https://moodle.queensu.ca/2013-14/dashboard.php"
+        "https://moodle.queensu.ca/*/dashboard.php"
       ],
       "js": [
         "jquery-2.0.3.js",
