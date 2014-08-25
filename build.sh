@@ -2,13 +2,12 @@
 APP_NAME="QueensSSOSaver"
 BUILD_DIR="_build"
 BUILD_FILES=( \
-    "jquery-2.0.3.js" \
-    "JQueryRC4.js" \
     "LICENSE" \
     "login.js" \
     "manifest.json" \
     "README.md" \
     "redirect.js" \
+    "sjcl.js" \
     )
 
 rm $BUILD_DIR/ -r

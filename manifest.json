@@ -10,8 +10,7 @@
         "https://login.queensu.ca/idp/Authn/UserPassword"
       ],
       "js": [
-        "jquery-2.0.3.js",
-        "JQueryRC4.js",
+        "sjcl.js",
         "login.js"
       ],
       "run_at": "document_end"
