@@ -1,14 +1,17 @@
-var notLoggedInStr = "not logged in";
-if ($(".logininfo").text().toLowerCase().indexOf(notLoggedInStr) >= 0) {
+(function loginIfNeeded() {
+  'use strict';
 
-  var loginLink = "#"
-  var loginChildren = $(".logininfo").find('a').each(function() {
-    if ($(this).text().toLowerCase().indexOf("login") >= 0) {
-      loginLink = $(this).attr("href");
-      return false;
+  var NOT_LOGGED_IN_TEXT = 'not logged in',
+      LOGIN_TEXT = 'login',
+      loginInfoDiv = document.querySelector('.logininfo');
+
+  if (loginInfoDiv && loginInfoDiv.innerHTML.toLowerCase().indexOf(NOT_LOGGED_IN_TEXT) !== -1) {
+
+    var loginLink = loginInfoDiv.querySelector('a');
+
+    // confirm that this is the Login link
+    if (loginLink && loginLink.text.toLowerCase() === LOGIN_TEXT){
+      window.location = loginLink.href || '#';
     }
-  });
-
-  // should follow something like "https://moodle.queensu.ca/2013-14/login/index.php"
-  window.location = loginLink;
-}
+  }
+})();

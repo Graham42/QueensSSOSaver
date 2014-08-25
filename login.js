@@ -1,30 +1,66 @@
 function randomString(length) {
-  var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\'
+  'use strict';
+  var CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
   var result = '';
   for (var i = length; i > 0; --i) {
-    result += chars[Math.round(Math.random() * (chars.length - 1))];
+    result += CHARS[Math.round(Math.random() * (CHARS.length - 1))];
   }
   return result;
 }
 
-chrome.storage.local.get(['queensUserName', 'queensHashedWord', 'myQHashKey'], function(items) {
+(function autoLogin () {
+  'use strict';
 
-  if (items.queensUserName && items.queensHashedWord && items.myQHashKey) {
-    $('#q_shib_login')[0].j_username.value = items.queensUserName;
-    $('#q_shib_login')[0].j_password.value = $.rc4DecryptStr(items.queensHashedWord, items.myQHashKey);
-    $('#q_shib_login').submit();
+  var FORM_ID = '#q_shib_login',
+      USERNAME_INPUT_ID = '#username',
+      PASSWORD_INPUT_ID = '#password',
+      AUTH_FAILED_CLASS = '.fail-message',
+      USERNAME_KEY = 'queensUserName',
+      HASHED_WORD_KEY = 'queensHashedWord',
+      MY_HASH_KEY = 'myQHashKey';
 
-  } else {
-    $('#q_shib_login').submit(function(event) {
-      var queensUserName = event.currentTarget.j_username.value;
-      var hashkey = randomString(23);
-      var queensHashedWord = $.rc4EncryptStr(event.currentTarget.j_password.value, hashkey);
+  chrome.storage.local.get(
+    [USERNAME_KEY, HASHED_WORD_KEY, MY_HASH_KEY],
+    function (items) {
 
-      chrome.storage.local.set({
-        queensUserName: queensUserName,
-        queensHashedWord: queensHashedWord,
-        myQHashKey : hashkey
-      });
-    });
-  }
-});
+      var loginForm = document.querySelector(FORM_ID);
+      if (!loginForm){
+        console.error('Login form not found');
+        return;
+      }
+
+      // If authentication failed message, clear saved password
+      if (document.querySelector(AUTH_FAILED_CLASS)){
+        items = {};
+        chrome.storage.local.set({
+          USERNAME_KEY: '',
+          HASHED_WORD_KEY: '',
+          MY_HASH_KEY : ''
+        });
+      }
+
+      // auto login if data saved
+      if (items[USERNAME_KEY] && items[HASHED_WORD_KEY] && items[MY_HASH_KEY]) {
+        loginForm.querySelector(USERNAME_INPUT_ID).value = items[USERNAME_KEY];
+        loginForm.querySelector(PASSWORD_INPUT_ID).value = $.rc4DecryptStr(items[HASHED_WORD_KEY], items[MY_HASH_KEY]);
+        loginForm.submit();
+
+      }
+      // else capture login info for next time
+      else {
+        loginForm.addEventListener(
+          'submit',
+          function(event) {
+            var newItems = {};
+            newItems[USERNAME_KEY] = event.currentTarget.j_username.value;
+            newItems[MY_HASH_KEY] = randomString(23);
+            newItems[HASHED_WORD_KEY] = $.rc4EncryptStr(event.currentTarget.j_password.value, newItems[MY_HASH_KEY]);
+
+            chrome.storage.local.set(newItems);
+          },
+          false);
+      }
+    }
+  );
+
+})();

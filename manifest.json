@@ -3,9 +3,6 @@
   "version": "0.0.2",
   "manifest_version": 2,
   "description": "Improve easy of use of Queen's SSO",
-  "background": {
-    "scripts": ["background.js"]
-  },
   "homepage_url": "https://github.com/Queens-Hacks",
   "content_scripts": [
     {
@@ -21,10 +18,9 @@
     },
     {
       "matches": [
-        "https://moodle.queensu.ca/*/dashboard.php"
+        "https://moodle.queensu.ca/*"
       ],
       "js": [
-        "jquery-2.0.3.js",
         "redirect.js"
       ],
       "run_at": "document_end"

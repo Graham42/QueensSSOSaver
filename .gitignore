@@ -1,4 +1,3 @@
 *.swp
 *.sublime-*
-venv/
 _build/
