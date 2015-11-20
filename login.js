@@ -8,9 +8,31 @@ function randomString(length) {
   return result;
 }
 
+function storageProxy(){
+  try {
+    return chrome.storage.local;
+  } catch (e) {
+    return {
+      get: function(keys, cb){
+        var r = {};
+        keys.forEach(function(k){
+          r[k] = localStorage.getItem(k);
+        });
+        cb(r);
+      },
+      set: function(x){
+        Object.keys(x).forEach(function(k){
+          localStorage.setItem(k, x[k]);
+        });
+      }
+    };
+  }
+}
+
 (function autoLogin () {
   'use strict';
 
+  var _storage = storageProxy();
 
   var FORM_IDS = '#q_shib_login, #aspnetForm',
       USERNAME_INPUT_IDS = '#username, [id*=UsernameTextBox]',
@@ -21,7 +43,7 @@ function randomString(length) {
       HASHED_WORD_KEY = md5('queensHashedWord'),
       MY_HASH_KEY = md5('myQHashKey');
 
-  chrome.storage.local.get(
+  _storage.get(
     [USERNAME_KEY, HASHED_WORD_KEY, MY_HASH_KEY],
     function (items) {
 
@@ -37,7 +59,7 @@ function randomString(length) {
         newItems[USERNAME_KEY] = '';
         newItems[HASHED_WORD_KEY] =  '';
         newItems[MY_HASH_KEY] = '';
-        chrome.storage.local.set(newItems);
+        _storage.set(newItems);
       }
 
       // define this as a function that can be called
@@ -50,7 +72,7 @@ function randomString(length) {
             newItems[USERNAME_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], event.currentTarget.j_username.value);
             newItems[HASHED_WORD_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], event.currentTarget.j_password.value);
 
-            chrome.storage.local.set(newItems);
+            _storage.set(newItems);
           },
           false);
       }

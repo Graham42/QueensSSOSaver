@@ -1,7 +1,13 @@
 {
   "name": "Queen's SSO Saver",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "manifest_version": 2,
+
+  "applications": {
+    "gecko": {
+      "id": "Queens-SSO-Saver@qhack.ca"
+    }
+  },
   "description": "Improve easy of use of Queen's SSO",
   "homepage_url": "https://github.com/Graham42/QueensSSOSaver",
   "icons": {
