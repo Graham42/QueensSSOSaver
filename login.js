@@ -15,9 +15,9 @@ function randomString(length) {
       USERNAME_INPUT_ID = '#username',
       PASSWORD_INPUT_ID = '#password',
       AUTH_FAILED_CLASS = '.fail-message',
-      USERNAME_KEY = 'queensUserName',
-      HASHED_WORD_KEY = 'queensHashedWord',
-      MY_HASH_KEY = 'myQHashKey';
+      USERNAME_KEY = md5('queensUserName'),
+      HASHED_WORD_KEY = md5('queensHashedWord'),
+      MY_HASH_KEY = md5('myQHashKey');
 
   chrome.storage.local.get(
     [USERNAME_KEY, HASHED_WORD_KEY, MY_HASH_KEY],

@@ -10,6 +10,7 @@
         "https://login.queensu.ca/idp/Authn/UserPassword"
       ],
       "js": [
+        "md5.min.js",
         "sjcl.js",
         "login.js"
       ],
