@@ -4,6 +4,9 @@
   "manifest_version": 2,
   "description": "Improve easy of use of Queen's SSO",
   "homepage_url": "https://github.com/Graham42/QueensSSOSaver",
+  "icons": {
+      "128": "icon_128.png"
+  },
   "content_scripts": [
     {
       "matches": [
