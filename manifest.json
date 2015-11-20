@@ -1,13 +1,14 @@
 {
   "name": "Queen's SSO Saver",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "manifest_version": 2,
   "description": "Improve easy of use of Queen's SSO",
   "homepage_url": "https://github.com/Graham42/QueensSSOSaver",
   "content_scripts": [
     {
       "matches": [
-        "https://login.queensu.ca/idp/Authn/UserPassword"
+        "https://login.queensu.ca/*",
+        "https://sts.queensu.ca/*"
       ],
       "js": [
         "md5.min.js",
