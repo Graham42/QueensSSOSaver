@@ -11,26 +11,28 @@ function randomString(length) {
 (function autoLogin () {
   'use strict';
 
-  var FORM_ID = '#q_shib_login',
-      USERNAME_INPUT_ID = '#username',
-      PASSWORD_INPUT_ID = '#password',
-      AUTH_FAILED_CLASS = '.fail-message',
-      USERNAME_KEY = 'queensUserName',
-      HASHED_WORD_KEY = 'queensHashedWord',
-      MY_HASH_KEY = 'myQHashKey';
+
+  var FORM_IDS = '#q_shib_login, #aspnetForm',
+      USERNAME_INPUT_IDS = '#username, [id*=UsernameTextBox]',
+      PASSWORD_INPUT_IDS = '#password, [id*=PasswordTextBox]',
+      AUTH_FAILED_IDS = '.fail-message, [id*=ErrorTextLabel]',
+      SUBMIT_BUTTON_IDS = '[id*=SubmitButton]',
+      USERNAME_KEY = md5('queensUserName'),
+      HASHED_WORD_KEY = md5('queensHashedWord'),
+      MY_HASH_KEY = md5('myQHashKey');
 
   chrome.storage.local.get(
     [USERNAME_KEY, HASHED_WORD_KEY, MY_HASH_KEY],
     function (items) {
 
-      var loginForm = document.querySelector(FORM_ID);
+      var loginForm = document.querySelectorAll(FORM_IDS)[0];
       if (!loginForm){
         console.error('Login form not found');
         return;
       }
 
       // If authentication failed message, clear saved password
-      if (document.querySelector(AUTH_FAILED_CLASS)){
+      if (document.querySelectorAll(AUTH_FAILED_IDS).length > 0){
         var newItems = {};
         newItems[USERNAME_KEY] = '';
         newItems[HASHED_WORD_KEY] =  '';
@@ -57,9 +59,14 @@ function randomString(length) {
       if (items[USERNAME_KEY] && items[HASHED_WORD_KEY] && items[MY_HASH_KEY]) {
         // if can't decrypt, may need to get login info again
         try {
-          loginForm.querySelector(USERNAME_INPUT_ID).value = sjcl.decrypt(items[MY_HASH_KEY], items[USERNAME_KEY]);
-          loginForm.querySelector(PASSWORD_INPUT_ID).value = sjcl.decrypt(items[MY_HASH_KEY], items[HASHED_WORD_KEY]);
-          loginForm.submit();
+          loginForm.querySelectorAll(USERNAME_INPUT_IDS)[0].value = sjcl.decrypt(items[MY_HASH_KEY], items[USERNAME_KEY]);
+          loginForm.querySelectorAll(PASSWORD_INPUT_IDS)[0].value = sjcl.decrypt(items[MY_HASH_KEY], items[HASHED_WORD_KEY]);
+          var submitBtn = loginForm.querySelectorAll(SUBMIT_BUTTON_IDS)[0];
+          if (submitBtn){
+            submitBtn.click();
+          } else {
+            loginForm.submit();
+          }
         } catch(err) {
           listenToSave();
         }
