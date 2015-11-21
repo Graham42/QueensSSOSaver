@@ -9,24 +9,36 @@ function randomString(length) {
 }
 
 function storageProxy(){
+  'use strict';
   try {
     return chrome.storage.local;
   } catch (e) {
     return {
-      get: function(keys, cb){
+      get: function get(keys, cb){
         var r = {};
-        keys.forEach(function(k){
+        keys.forEach(function getValue(k){
           r[k] = localStorage.getItem(k);
         });
         cb(r);
       },
-      set: function(x){
-        Object.keys(x).forEach(function(k){
+      set: function set(x){
+        Object.keys(x).forEach(function setValue(k){
           localStorage.setItem(k, x[k]);
         });
       }
     };
   }
+}
+
+function getElement(pattern, parentElem){
+  'use strict';
+  var elem = ((parentElem) ? parentElem : document).querySelectorAll(pattern)[0];
+  if (!elem){
+    var errMsg = 'No elements found for "'+pattern+'"';
+    console.error(errMsg);
+    throw errMsg;
+  }
+  return elem;
 }
 
 (function autoLogin () {
@@ -45,16 +57,13 @@ function storageProxy(){
 
   _storage.get(
     [USERNAME_KEY, HASHED_WORD_KEY, MY_HASH_KEY],
-    function (items) {
+    function getCb (items) {
 
-      var loginForm = document.querySelectorAll(FORM_IDS)[0];
-      if (!loginForm){
-        console.error('Login form not found');
-        return;
-      }
+      var loginForm = getElement(FORM_IDS);
 
       // If authentication failed message, clear saved password
       if (document.querySelectorAll(AUTH_FAILED_IDS).length > 0){
+        console.log('Failed login, reseting items');
         var newItems = {};
         newItems[USERNAME_KEY] = '';
         newItems[HASHED_WORD_KEY] =  '';
@@ -66,11 +75,17 @@ function storageProxy(){
       function listenToSave(){
         loginForm.addEventListener(
           'submit',
-          function(event) {
+          function submitEvent (event) {
             var newItems = {};
             newItems[MY_HASH_KEY] = randomString(23);
-            newItems[USERNAME_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], event.currentTarget.j_username.value);
-            newItems[HASHED_WORD_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], event.currentTarget.j_password.value);
+
+            var userVal = getElement(USERNAME_INPUT_IDS, loginForm).value;
+            var pVal = getElement(PASSWORD_INPUT_IDS, loginForm).value;
+            if (!userVal || !pVal){
+              throw 'Couldn\'t get username or pass values';
+            }
+            newItems[USERNAME_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], userVal);
+            newItems[HASHED_WORD_KEY] = sjcl.encrypt(newItems[MY_HASH_KEY], pVal);
 
             _storage.set(newItems);
           },
@@ -80,17 +95,22 @@ function storageProxy(){
       // auto login if data saved
       if (items[USERNAME_KEY] && items[HASHED_WORD_KEY] && items[MY_HASH_KEY]) {
         // if can't decrypt, may need to get login info again
+        var u, p;
         try {
-          loginForm.querySelectorAll(USERNAME_INPUT_IDS)[0].value = sjcl.decrypt(items[MY_HASH_KEY], items[USERNAME_KEY]);
-          loginForm.querySelectorAll(PASSWORD_INPUT_IDS)[0].value = sjcl.decrypt(items[MY_HASH_KEY], items[HASHED_WORD_KEY]);
-          var submitBtn = loginForm.querySelectorAll(SUBMIT_BUTTON_IDS)[0];
-          if (submitBtn){
-            submitBtn.click();
-          } else {
+          u = sjcl.decrypt(items[MY_HASH_KEY], items[USERNAME_KEY]);
+          p = sjcl.decrypt(items[MY_HASH_KEY], items[HASHED_WORD_KEY]);
+        } catch(err) {
+          console.error('Couldn\'t decrypt');
+          listenToSave();
+        }
+        if (u && p){
+          getElement(USERNAME_INPUT_IDS, loginForm).value = u;
+          getElement(PASSWORD_INPUT_IDS, loginForm).value = p;
+          try {
+            getElement(SUBMIT_BUTTON_IDS, loginForm).click();
+          } catch (e) {
             loginForm.submit();
           }
-        } catch(err) {
-          listenToSave();
         }
       }
       // else capture login info for next time
