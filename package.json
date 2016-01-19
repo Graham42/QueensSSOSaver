@@ -1,0 +1,14 @@
+{
+  "name": "QueensSSOSaver",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.4.7",
+    "copy": "^0.1.2",
+    "gulp": "*",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.4.4"
+  }
+}
